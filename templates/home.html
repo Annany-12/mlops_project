@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Boston House Price Prediction</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #121212;
+      color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #1e1e1e;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+      width: 480px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #ff9800;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #2c2c2c;
+      color: #f5f5f5;
+      font-size: 14px;
+    }
+
+    input:focus {
+      outline: 2px solid #ff9800;
+    }
+
+    small {
+      display: block;
+      font-size: 12px;
+      color: #bbb;
+      margin-bottom: 8px;
+    }
+
+    .btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background-color: #ff9800;
+      color: #121212;
+    }
+
+    .btn-primary:hover {
+      background-color: #e68900;
+    }
+
+    .btn-secondary {
+      background-color: #444;
+      color: #f5f5f5;
+      margin-top: 10px;
+    }
+
+    .btn-secondary:hover {
+      background-color: #666;
+    }
+
+    .prediction {
+      margin-top: 20px;
+      padding: 15px;
+      background: #2c2c2c;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #4caf50;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏠 Boston House Price Prediction</h1>
+    <form id="predictForm" action="{{ url_for('predict')}}" method="post">
+
+      <label for="CRIM">Crime Rate</label>
+      <small>Per capita crime rate by town (Typical: 0.0 – 90.0)</small>
+      <input type="number" step="any" name="CRIM" required>
+
+      <label for="ZN">Residential Land Zone (%)</label>
+      <small>Proportion of land zoned for large lots (0 – 100)</small>
+      <input type="number" step="any" name="ZN" required>
+
+      <label for="INDUS">Non-retail Business Land (%)</label>
+      <small>Proportion of non-retail business acres (0 – 30)</small>
+      <input type="number" step="any" name="INDUS" required>
+
+      <label for="CHAS">Bounded by Charles River</label>
+      <small>1 = Yes, 0 = No</small>
+      <input type="number" step="1" min="0" max="1" name="CHAS" required>
+
+      <label for="NOX">Nitric Oxides Concentration</label>
+      <small>NOx concentration (0.3 – 0.9)</small>
+      <input type="number" step="any" name="NOX" required>
+
+      <label for="RM">Avg Rooms per Dwelling</label>
+      <small>Average rooms per house (3 – 9)</small>
+      <input type="number" step="any" name="RM" required>
+
+      <label for="AGE">Age of Houses (%)</label>
+      <small>Proportion built before 1940 (2 – 100)</small>
+      <input type="number" step="any" name="AGE" required>
+
+      <label for="DIS">Distance to Employment Centers</label>
+      <small>Weighted distance to Boston centers (1 – 12)</small>
+      <input type="number" step="any" name="DIS" required>
+
+      <label for="RAD">Highway Accessibility Index</label>
+      <small>Accessibility index (1 – 24)</small>
+      <input type="number" step="any" name="RAD" required>
+
+      <label for="TAX">Property Tax Rate</label>
+      <small>Tax rate per $10,000 (180 – 750)</small>
+      <input type="number" step="any" name="TAX" required>
+
+      <label for="PTRATIO">Pupil-Teacher Ratio</label>
+      <small>Pupil–teacher ratio (12 – 22)</small>
+      <input type="number" step="any" name="PTRATIO" required>
+
+      <label for="B">Proportion of Black Residents</label>
+      <small>1000(Bk – 0.63)^2 (0 – 400)</small>
+      <input type="number" step="any" name="B" required>
+
+      <label for="LSTAT">Lower Status Population (%)</label>
+      <small>Percentage of lower status population (1 – 38)</small>
+      <input type="number" step="any" name="LSTAT" required>
+
+      <button type="submit" class="btn btn-primary">Predict Price</button>
+      <button type="button" class="btn btn-secondary" onclick="fillRandom()">Random Inputs</button>
+    </form>
+
+    {% if prediction_text %}
+      <div class="prediction">
+        {{ prediction_text }}
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    function fillRandom() {
+      const ranges = {
+        CRIM: [0.0, 90.0],
+        ZN: [0.0, 100.0],
+        INDUS: [0.0, 30.0],
+        CHAS: [0, 1],
+        NOX: [0.3, 0.9],
+        RM: [3.0, 9.0],
+        AGE: [2.0, 100.0],
+        DIS: [1.0, 12.0],
+        RAD: [1, 24],
+        TAX: [180, 750],
+        PTRATIO: [12.0, 22.0],
+        B: [0.0, 400.0],
+        LSTAT: [1.0, 38.0]
+      };
+
+      for (let field in ranges) {
+        const [min, max] = ranges[field];
+        let value = Math.random() * (max - min) + min;
+        if (Number.isInteger(min) && Number.isInteger(max)) {
+          value = Math.round(value);
+        } else {
+          value = value.toFixed(2);
+        }
+        document.querySelector(`input[name="${field}"]`).value = value;
+      }
+    }
+  </script>
+</body>
+</html>
